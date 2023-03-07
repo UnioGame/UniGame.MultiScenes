@@ -24,10 +24,11 @@ namespace UniGame.MultiScene.Runtime
         /// </summary>
         /// <param name="multiSceneAsset">multiscene asset</param>
         /// <param name="loadSceneMode">scene load mode</param>
-        public static async UniTask OpenScenesAsync(
+        public static async UniTask<MultiScene> OpenScenesAsync(
             this MultiSceneAsset multiSceneAsset, 
             LoadSceneMode loadSceneMode)
         {
+            var multiScenes = new MultiScene();
             var sceneHandlers = multiSceneAsset.SceneHandlers;
             var isFirst = true;
 
@@ -51,13 +52,26 @@ namespace UniGame.MultiScene.Runtime
 
             foreach (var handler in sceneHandlers)
             {
-                if (!handler.IsLoaded || !handler.IsActive)
-                    continue;
+                if (!handler.IsLoaded) continue;
                 
                 var scene = SceneManager.GetSceneByName(handler.Name);
+                multiScenes.scenes.Add(scene);
+                
+                if(!handler.IsActive) continue;
+                
                 SceneManager.SetActiveScene(scene);
             }
 
+            return multiScenes;
+        }
+        
+        public static async UniTask CloseScenes(this MultiScene multiSceneAsset)
+        {
+            var scenes = multiSceneAsset.scenes;
+            foreach (var scene in scenes)
+            {
+                await SceneManager.UnloadSceneAsync(scene);
+            }
         }
         
         private static async UniTask<Scene> LoadAddressablesSceneAsync(string guid, LoadSceneMode loadSceneMode)
