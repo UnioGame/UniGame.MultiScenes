@@ -4,16 +4,18 @@
     using System.Collections.Generic;
     using UnityEngine;
     using UnityEngine.SceneManagement;
+    using UnityEngine.Serialization;
 
     public sealed class MultiSceneAsset : ScriptableObject
     {
+        [FormerlySerializedAs("_sceneHandlers")] 
         [SerializeField]
-        private SceneHandler[] _sceneHandlers;
+        public SceneHandler[] sceneHandlers = Array.Empty<SceneHandler>();
 
         public SceneHandler[] SceneHandlers
         {
-            get => _sceneHandlers;
-            set => _sceneHandlers = value;
+            get => sceneHandlers;
+            set => sceneHandlers = value;
         }
     }
 

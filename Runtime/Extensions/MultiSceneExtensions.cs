@@ -19,6 +19,19 @@ namespace UniGame.MultiScene.Runtime
             await multiSceneAsset.OpenScenesAsync(loadSceneMode);
         }
 
+        public static bool IsLoaded(this MultiSceneAsset multiSceneAsset)
+        {
+            var scenes = multiSceneAsset.sceneHandlers;
+            
+            foreach (var scene in scenes)
+            {
+                var loadedScene = SceneManager.GetSceneByName(scene.Name);
+                if (!loadedScene.isLoaded) return false;
+            }
+
+            return true;
+        }
+        
         /// <summary>
         /// Open scenes async by MultiSceneAsset with target LoadSceneMode
         /// </summary>
@@ -26,7 +39,7 @@ namespace UniGame.MultiScene.Runtime
         /// <param name="loadSceneMode">scene load mode</param>
         public static async UniTask<MultiScene> OpenScenesAsync(
             this MultiSceneAsset multiSceneAsset, 
-            LoadSceneMode loadSceneMode)
+            LoadSceneMode loadSceneMode,bool reload = true)
         {
             var multiScenes = new MultiScene();
             var sceneHandlers = multiSceneAsset.SceneHandlers;
@@ -39,6 +52,9 @@ namespace UniGame.MultiScene.Runtime
                 var sceneMode = isFirst && loadSceneMode == LoadSceneMode.Single 
                     ? LoadSceneMode.Single : LoadSceneMode.Additive;
                 isFirst = false;
+                
+                if(!reload && SceneManager.GetSceneByName(handler.Name).isLoaded)
+                    continue;
 
                 if (handler.IsAddressables)
                 {
