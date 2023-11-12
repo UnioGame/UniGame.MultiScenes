@@ -86,7 +86,7 @@ namespace UniGame.MultiScene.Runtime
             var scenes = multiSceneAsset.scenes;
             foreach (var scene in scenes)
             {
-                await SceneManager.UnloadSceneAsync(scene);
+                await SceneManager.UnloadSceneAsync(scene).ToUniTask();
             }
         }
         
