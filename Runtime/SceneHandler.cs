@@ -2,36 +2,42 @@
 {
     using System;
     using UnityEngine;
+    using UnityEngine.Serialization;
 
     [Serializable]
     public struct SceneHandler
     {
+        [FormerlySerializedAs("_name")] 
         [SerializeField]
-        private string _name;
+        public string name;
+        [FormerlySerializedAs("_guid")] 
         [SerializeField]
-        private string _guid;
+        public string guid;
+        [FormerlySerializedAs("_isActive")] 
         [SerializeField]
-        private bool _isActive;
+        public bool isActive;
+        [FormerlySerializedAs("_isLoaded")] 
         [SerializeField]
-        private bool _isLoaded;
+        public bool isLoaded;
+        [FormerlySerializedAs("_isAddressables")] 
         [SerializeField]
-        private bool _isAddressables;
+        public bool isAddressables;
         
-        public string Name => _name;
-        public string Guid => _guid;
+        public string Name => name;
+        public string Guid => guid;
 
-        public bool IsActive => _isActive;
-        public bool IsLoaded => _isLoaded;
-        public bool IsAddressables => _isAddressables;
+        public bool IsActive => isActive;
+        public bool IsLoaded => isLoaded;
+        public bool IsAddressables => isAddressables;
 
         public SceneHandler(string name, string guid, bool isActive, bool isLoaded,bool isAddressables)
         {
-            _name = name;
-            _guid = guid;
+            this.name = name;
+            this.guid = guid;
 
-            _isActive = isActive;
-            _isLoaded = isLoaded;
-            _isAddressables = isAddressables;
+            this.isActive = isActive;
+            this.isLoaded = isLoaded;
+            this.isAddressables = isAddressables;
         }
     }
 }

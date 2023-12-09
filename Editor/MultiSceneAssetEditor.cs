@@ -17,25 +17,25 @@ namespace UniGame.MultiScene.Editor
         private static bool OpenAssetHandler(int instanceId, int line)
         {
             var obj = EditorUtility.InstanceIDToObject(instanceId);
-            if (!(obj is MultiSceneAsset MultiSceneAsset))
+            if (obj is not MultiSceneAsset multiSceneAsset)
                 return false;
 
-            Open(MultiSceneAsset);
+            Open(multiSceneAsset);
             return true;
         }
         
         [MenuItem("Assets/Create/Multi Scene", priority = 1)]
         private static void Create()
         {
-            var MultiSceneAsset = CreateMultiSceneAsset();
-            ProjectWindowUtil.CreateAsset(MultiSceneAsset, "New Multi Scene.asset");
+            var multiSceneAsset = CreateMultiSceneAsset();
+            ProjectWindowUtil.CreateAsset(multiSceneAsset, "New Multi Scene.asset");
         }
 
         public static MultiSceneAsset CreateMultiSceneAsset()
         {
-            var MultiSceneAsset = CreateInstance<MultiSceneAsset>();
-            Update(MultiSceneAsset);
-            return MultiSceneAsset;
+            var multiSceneAsset = CreateInstance<MultiSceneAsset>();
+            Update(multiSceneAsset);
+            return multiSceneAsset;
         }
 
         public static void Update(MultiSceneAsset MultiSceneAsset)
@@ -128,14 +128,14 @@ namespace UniGame.MultiScene.Editor
 
         public override void OnInspectorGUI()
         {
-            var MultiSceneAsset = (MultiSceneAsset) target;
+            var multiSceneAsset = (MultiSceneAsset) target;
 
             using (new EditorGUILayout.HorizontalScope())
             {
                 if (GUILayout.Button("Open", GUILayout.ExpandWidth(false)))
-                    Open(MultiSceneAsset);
+                    Open(multiSceneAsset);
                 
-                if (GUILayout.Button("Update", GUILayout.ExpandWidth(false)))
+                if (GUILayout.Button("Bake Scenes", GUILayout.ExpandWidth(false)))
                 {
                     var confirm = EditorUtility.DisplayDialog("Update Existing MultiSceneAsset?", "Are you sure you want to overwrite the existing multi scene?", "Update", "Cancel");
                     if (confirm)
@@ -143,18 +143,22 @@ namespace UniGame.MultiScene.Editor
                         Undo.RecordObject(target, "Update MultiSceneAsset");
                         EditorUtility.SetDirty(target);
                         
-                        Update(MultiSceneAsset);
+                        Update(multiSceneAsset);
                     }
                 }
 
                 if (GUILayout.Button("Validate", GUILayout.ExpandWidth(false)))
-                    Validate(MultiSceneAsset);
+                    Validate(multiSceneAsset);
 
             }
             
-            GUILayout.Label($"{MultiSceneAsset.SceneHandlers.Length} Scenes", EditorStyles.boldLabel);
-            foreach (var sceneHandler in MultiSceneAsset.SceneHandlers)
+            GUILayout.Label($"{multiSceneAsset.SceneHandlers.Length} Scenes", EditorStyles.boldLabel);
+            
+            var isDirty = false;
+
+            for (var i = 0; i < multiSceneAsset.SceneHandlers.Length; i++)
             {
+                ref var sceneHandler = ref multiSceneAsset.SceneHandlers[i];
                 using (new EditorGUILayout.VerticalScope())
                 {
                     var scenePath = AssetDatabase.GUIDToAssetPath(sceneHandler.Guid);
@@ -162,20 +166,34 @@ namespace UniGame.MultiScene.Editor
 
                     var activeLabel = sceneHandler.IsActive ? "Yes" : "No";
                     var loadedLabel = sceneHandler.IsLoaded ? "Yes" : "No";
-                    var addressablesLabel = sceneHandler.IsAddressables ? "Yes" : "No";
+                    var addressableLabel = sceneHandler.IsAddressables ? "Yes" : "No";
+
+                    var asset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
+                    var targetAsset = EditorGUILayout.ObjectField(asset, typeof(SceneAsset), false);
                     
+                    if (targetAsset != asset)
+                    {
+                        isDirty = true;
+                        sceneHandler.guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(targetAsset));
+                        Validate(multiSceneAsset);
+                    }
+
                     GUILayout.Label(fileName, EditorStyles.boldLabel);
                     EditorGUI.indentLevel++;
+                    
                     GUILayout.Label($"Path: {scenePath}");
                     GUILayout.Label($"Name: {sceneHandler.Name}");
                     GUILayout.Label($"Active: {activeLabel}");
                     GUILayout.Label($"Loaded: {loadedLabel}");
-                    GUILayout.Label($"Is Addressables: {addressablesLabel}");
-                    EditorGUI.indentLevel--;
+                    GUILayout.Label($"Is Addressables: {addressableLabel}");
                     
+                    EditorGUI.indentLevel--;
+
                     GUILayout.Space(10.0f);
                 }
             }
+
+            if (isDirty) EditorUtility.SetDirty(multiSceneAsset);
         }
     }
 }

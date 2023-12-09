@@ -17,6 +17,18 @@
             get => sceneHandlers;
             set => sceneHandlers = value;
         }
+        
+        public bool HasScene(string sceneName)
+        {
+            for (var i = 0; i < sceneHandlers.Length; i++)
+            {
+                var sceneHandler = sceneHandlers[i];
+                if (sceneHandler.name == sceneName)
+                    return true;
+            }
+
+            return false;
+        }
     }
 
     [Serializable]
