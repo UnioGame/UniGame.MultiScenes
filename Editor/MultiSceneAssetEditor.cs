@@ -1,16 +1,15 @@
 ﻿using UniGame.MultiScene.Runtime;
-using UnityEditor.AddressableAssets;
 
 namespace UniGame.MultiScene.Editor
 {
     using System.IO;
-    using System.Linq;
     using UnityEditor;
     using UnityEditor.Callbacks;
-    using UnityEditor.SceneManagement;
     using UnityEngine;
 
+#if !ODIN_INSPECTOR && !TRI_INSPECTOR
     [CustomEditor(typeof(MultiSceneAsset))]
+#endif
     public sealed class MultiSceneAssetEditor : Editor
     {
         [OnOpenAsset(1)]
@@ -20,7 +19,7 @@ namespace UniGame.MultiScene.Editor
             if (obj is not MultiSceneAsset multiSceneAsset)
                 return false;
 
-            Open(multiSceneAsset);
+            MultiSceneTool.Open(multiSceneAsset);
             return true;
         }
         
@@ -34,96 +33,8 @@ namespace UniGame.MultiScene.Editor
         public static MultiSceneAsset CreateMultiSceneAsset()
         {
             var multiSceneAsset = CreateInstance<MultiSceneAsset>();
-            Update(multiSceneAsset);
+            MultiSceneTool.Update(multiSceneAsset);
             return multiSceneAsset;
-        }
-
-        public static void Update(MultiSceneAsset MultiSceneAsset)
-        {
-            var setup = EditorSceneManager.GetSceneManagerSetup();
-            MultiSceneAsset.SceneHandlers = UpdateSceneHandlers(setup);
-            EditorUtility.SetDirty(MultiSceneAsset);
-        }
-
-        public static void Validate(MultiSceneAsset MultiSceneAsset)
-        {
-            var handles = MultiSceneAsset.SceneHandlers;
-            for (var i = 0; i < MultiSceneAsset.SceneHandlers.Length; i++)
-            {
-                var handler = MultiSceneAsset.SceneHandlers[i];
-                handles[i] = CreateHandle(handler.Guid, handler.IsActive, handler.IsLoaded);
-            }
-            EditorUtility.SetDirty(MultiSceneAsset);
-        }
-
-        private static SceneHandler[] UpdateSceneHandlers(SceneSetup[] sceneSetups)
-        {
-            var handlers = new SceneHandler[sceneSetups.Length];
-            for (var i = 0; i < sceneSetups.Length; i++)
-            {
-                var scene = sceneSetups[i];
-                var guid = AssetDatabase.AssetPathToGUID(scene.path);
-                var handle = CreateHandle(guid, scene.isActive, scene.isLoaded);
-                handlers[i] = handle;
-            }
-
-            return handlers;
-        }
-
-        private static SceneHandler CreateHandle(string guid,bool isActive, bool isLoaded)
-        {
-            var path = AssetDatabase.GUIDToAssetPath(guid);
-            var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
-            var isAddressablesAsset = IsAddressablesAsset(guid);
-            var handle = new SceneHandler(asset.name,guid,isActive, isLoaded,isAddressablesAsset);
-            return handle;
-        }
-
-        private static bool IsAddressablesAsset(string guid)
-        {
-            if (string.IsNullOrEmpty(guid))
-                return false;
-
-            var addressableSettings = AddressableAssetSettingsDefaultObject.Settings;
-            var entry = addressableSettings.FindAssetEntry(guid);
-            return entry != null;
-        }
-        
-        private static SceneSetup[] ToSceneSetup(MultiSceneAsset MultiSceneAsset)
-        {
-            return MultiSceneAsset.SceneHandlers.Select(ToSceneSetup).Where(IsSceneValid).ToArray();
-        }
-
-        private static bool IsSceneValid(SceneSetup sceneSetup)
-        {
-            if (string.IsNullOrEmpty(sceneSetup.path))
-                return false;
-
-            if (!File.Exists(sceneSetup.path))
-                return false;
-
-            return true;
-        }
-
-        private static SceneSetup ToSceneSetup(SceneHandler sceneHandler)
-        {
-            var sceneSetup = new SceneSetup
-            {
-                path = AssetDatabase.GUIDToAssetPath(sceneHandler.Guid),
-                isActive = sceneHandler.IsActive,
-                isLoaded = sceneHandler.IsLoaded
-            };
-
-            return sceneSetup;
-        }
-
-        private static void Open(MultiSceneAsset MultiSceneAsset)
-        {
-            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
-                return;
-            
-            var scenes = ToSceneSetup(MultiSceneAsset);
-            EditorSceneManager.RestoreSceneManagerSetup(scenes);
         }
 
         public override void OnInspectorGUI()
@@ -133,23 +44,13 @@ namespace UniGame.MultiScene.Editor
             using (new EditorGUILayout.HorizontalScope())
             {
                 if (GUILayout.Button("Open", GUILayout.ExpandWidth(false)))
-                    Open(multiSceneAsset);
+                    multiSceneAsset.Open();
                 
                 if (GUILayout.Button("Bake Scenes", GUILayout.ExpandWidth(false)))
-                {
-                    var confirm = EditorUtility.DisplayDialog("Update Existing MultiSceneAsset?", "Are you sure you want to overwrite the existing multi scene?", "Update", "Cancel");
-                    if (confirm)
-                    {
-                        Undo.RecordObject(target, "Update MultiSceneAsset");
-                        EditorUtility.SetDirty(target);
-                        
-                        Update(multiSceneAsset);
-                    }
-                }
+                    multiSceneAsset.BakeScenes();
 
                 if (GUILayout.Button("Validate", GUILayout.ExpandWidth(false)))
-                    Validate(multiSceneAsset);
-
+                    multiSceneAsset.Validate();
             }
             
             GUILayout.Label($"{multiSceneAsset.SceneHandlers.Length} Scenes", EditorStyles.boldLabel);
@@ -175,7 +76,7 @@ namespace UniGame.MultiScene.Editor
                     {
                         isDirty = true;
                         sceneHandler.guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(targetAsset));
-                        Validate(multiSceneAsset);
+                        MultiSceneTool.Validate(multiSceneAsset);
                     }
 
                     GUILayout.Label(fileName, EditorStyles.boldLabel);

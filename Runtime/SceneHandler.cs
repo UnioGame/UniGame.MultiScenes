@@ -4,21 +4,33 @@
     using UnityEngine;
     using UnityEngine.Serialization;
 
+#if ODIN_INSPECTOR
+    using Sirenix.OdinInspector;
+#endif
+    
     [Serializable]
     public struct SceneHandler
     {
         [FormerlySerializedAs("_name")] 
         [SerializeField]
         public string name;
+        
         [FormerlySerializedAs("_guid")] 
         [SerializeField]
+        [MultiSceneItem]
+#if ODIN_INSPECTOR
+        [DrawWithUnity]
+#endif
         public string guid;
+        
         [FormerlySerializedAs("_isActive")] 
         [SerializeField]
         public bool isActive;
+        
         [FormerlySerializedAs("_isLoaded")] 
         [SerializeField]
         public bool isLoaded;
+        
         [FormerlySerializedAs("_isAddressables")] 
         [SerializeField]
         public bool isAddressables;
