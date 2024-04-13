@@ -12,41 +12,27 @@ Multi scene support for Unity3D
 
 ## How to Install
 
-Add to your project manifiest by path [%UnityProject%]/Packages/manifiest.json new Scope:
+**Odin Inspector or Tri-Inspector recommended to usage with this Package (https://odininspector.com | https://github.com/codewriter-packages/Tri-Inspector)**
+
+Add to your project manifiest by path [%UnityProject%]/Packages/manifiest.json these lines:
 
 ```json
 {
-  "scopedRegistries": [
-    {
-      "name": "UniGame",
-      "url": "http://package.unigame.pro:4873/",
-      "scopes": [
-        "com.unigame",
-        "com.littlebigfun",
-        "com.alelievr"
-      ]
-    },
-    
-    "__comment":"another scoped registers",
-    
-  ],
+ "dependencies": {
+    "com.unigame.multiscenes" : "https://github.com/UnioGame/UniGame.MultiScenes.git"
+  }
 }
-
 ```
-
-Now install via Package Manager
-
-![](https://github.com/UnioGame/UniGame.MultiScenes/blob/main/GitAssets/install.png)
 
 # Usages
 
 ## Create Multiscene Asset
 
-![](https://github.com/UnioGame/UniGame.MultiScenes/blob/main/GitAssets/create3.png)
+![](https://github.com/UnioGame/UniGame.MultiScenes/blob/main/GitAssets/mscene1.png)
 
 When your asset is ready you can load a set of game scenes and bake them into asset data
 
-![](https://github.com/UnioGame/UniGame.MultiScenes/blob/main/GitAssets/inspector1.png)
+![](https://github.com/UnioGame/UniGame.MultiScenes/blob/main/GitAssets/mscene2.png)
 
 * Open - Load baked scene into workspace
 * Update - Bake current loaded scene from worlspace into asset data
