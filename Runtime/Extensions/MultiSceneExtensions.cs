@@ -1,5 +1,7 @@
 namespace UniGame.MultiScene.Runtime
 {
+    using AddressableTools.Runtime;
+    using Core.Runtime;
     using Cysharp.Threading.Tasks;
     using UnityEngine.AddressableAssets;
     using UnityEngine.SceneManagement;
@@ -11,11 +13,15 @@ namespace UniGame.MultiScene.Runtime
         /// </summary>
         /// <param name="multiSceneAssetReference">reference to multiscene asset</param>
         /// <param name="loadSceneMode">scene load mode</param>
+        /// <param name="lifeTime"></param>
         public static async UniTask OpenScenesAsync(
             this AssetReferenceT<MultiSceneAsset> multiSceneAssetReference, 
             LoadSceneMode loadSceneMode)
         {
-            var multiSceneAsset = await multiSceneAssetReference.LoadAssetAsync<MultiSceneAsset>().ToUniTask();
+            var multiSceneAsset = await multiSceneAssetReference
+                .LoadAssetAsync<MultiSceneAsset>()
+                .ToUniTask();
+            
             await multiSceneAsset.OpenScenesAsync(loadSceneMode);
         }
 
@@ -31,15 +37,17 @@ namespace UniGame.MultiScene.Runtime
 
             return true;
         }
-        
+
         /// <summary>
         /// Open scenes async by MultiSceneAsset with target LoadSceneMode
         /// </summary>
         /// <param name="multiSceneAsset">multiscene asset</param>
         /// <param name="loadSceneMode">scene load mode</param>
+        /// <param name="reload"></param>
         public static async UniTask<MultiScene> OpenScenesAsync(
             this MultiSceneAsset multiSceneAsset, 
-            LoadSceneMode loadSceneMode,bool reload = true)
+            LoadSceneMode loadSceneMode, 
+            bool reload = true)
         {
             var multiScenes = new MultiScene();
             var sceneHandlers = multiSceneAsset.SceneHandlers;
@@ -58,7 +66,7 @@ namespace UniGame.MultiScene.Runtime
 
                 if (handler.IsAddressables)
                 {
-                    await LoadAddressablesSceneAsync(handler.Guid, sceneMode);
+                    await LoadAddressableSceneAsync(handler.Guid, sceneMode);
                 }
                 else
                 {
@@ -85,12 +93,10 @@ namespace UniGame.MultiScene.Runtime
         {
             var scenes = multiSceneAsset.scenes;
             foreach (var scene in scenes)
-            {
-                await SceneManager.UnloadSceneAsync(scene);
-            }
+                await SceneManager.UnloadSceneAsync(scene).ToUniTask();
         }
         
-        private static async UniTask<Scene> LoadAddressablesSceneAsync(string guid, LoadSceneMode loadSceneMode)
+        private static async UniTask<Scene> LoadAddressableSceneAsync(string guid, LoadSceneMode loadSceneMode)
         {
             var result = await Addressables.LoadSceneAsync(guid,loadSceneMode).ToUniTask();
             return result.Scene;
