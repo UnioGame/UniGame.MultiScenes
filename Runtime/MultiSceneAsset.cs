@@ -20,6 +20,8 @@
     
     public sealed class MultiSceneAsset : ScriptableObject
     {
+        public string id = string.Empty;
+        
 #if ODIN_INSPECTOR || TRI_INSPECTOR
         [InlineProperty]
 #endif
