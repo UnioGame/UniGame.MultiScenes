@@ -66,7 +66,7 @@ namespace UniGame.MultiScene.Editor
                     var fileName = Path.GetFileNameWithoutExtension(scenePath);
 
                     var activeLabel = sceneHandler.IsActive ? "Yes" : "No";
-                    var loadedLabel = sceneHandler.IsLoaded ? "Yes" : "No";
+                    var loadedLabel = sceneHandler.loadScene ? "Yes" : "No";
                     var addressableLabel = sceneHandler.IsAddressables ? "Yes" : "No";
 
                     var asset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);

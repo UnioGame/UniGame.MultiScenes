@@ -28,7 +28,7 @@
             for (var i = 0; i < MultiSceneAsset.SceneHandlers.Length; i++)
             {
                 var handler = MultiSceneAsset.SceneHandlers[i];
-                handles[i] = CreateHandle(handler.Guid, handler.IsActive, handler.IsLoaded);
+                handles[i] = CreateHandle(handler.Guid, handler.IsActive, handler.loadScene);
             }
             EditorUtility.SetDirty(MultiSceneAsset);
         }
@@ -100,7 +100,7 @@
             {
                 path = AssetDatabase.GUIDToAssetPath(sceneHandler.Guid),
                 isActive = sceneHandler.IsActive,
-                isLoaded = sceneHandler.IsLoaded
+                isLoaded = sceneHandler.loadScene
             };
 
             return sceneSetup;

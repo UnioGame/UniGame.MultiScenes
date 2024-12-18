@@ -27,9 +27,10 @@
         [SerializeField]
         public bool isActive;
         
+        [FormerlySerializedAs("isLoaded")]
         [FormerlySerializedAs("_isLoaded")] 
         [SerializeField]
-        public bool isLoaded;
+        public bool loadScene;
         
         [FormerlySerializedAs("_isAddressables")] 
         [SerializeField]
@@ -39,16 +40,16 @@
         public string Guid => guid;
 
         public bool IsActive => isActive;
-        public bool IsLoaded => isLoaded;
+        public bool LoadScene => loadScene;
         public bool IsAddressables => isAddressables;
 
-        public SceneHandler(string name, string guid, bool isActive, bool isLoaded,bool isAddressables)
+        public SceneHandler(string name, string guid, bool isActive, bool loadScene,bool isAddressables)
         {
             this.name = name;
             this.guid = guid;
 
             this.isActive = isActive;
-            this.isLoaded = isLoaded;
+            this.loadScene = loadScene;
             this.isAddressables = isAddressables;
         }
     }

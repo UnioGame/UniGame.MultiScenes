@@ -55,7 +55,7 @@ namespace UniGame.MultiScene.Runtime
 
             foreach (var handler in sceneHandlers)
             {
-                if (handler.IsLoaded) continue;
+                if (!handler.loadScene) continue;
                 
                 var sceneMode = isFirst && loadSceneMode == LoadSceneMode.Single 
                     ? LoadSceneMode.Single : LoadSceneMode.Additive;
@@ -76,7 +76,7 @@ namespace UniGame.MultiScene.Runtime
 
             foreach (var handler in sceneHandlers)
             {
-                if (handler.IsLoaded) continue;
+                if (!handler.loadScene) continue;
                 
                 var scene = SceneManager.GetSceneByName(handler.Name);
                 multiScenes.scenes.Add(scene);
