@@ -18,6 +18,7 @@
     using TriInspector;
 #endif
     
+    [CreateAssetMenu(menuName = "MultiScene/MultiSceneAsset", fileName = "MultiSceneAsset")]
     public sealed class MultiSceneAsset : ScriptableObject
     {
         public string id = string.Empty;
