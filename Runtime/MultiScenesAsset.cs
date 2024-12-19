@@ -5,8 +5,12 @@ namespace VN.Data.API
     using System.Linq;
     using Sirenix.OdinInspector;
     using UniGame.MultiScene.Runtime;
-    using UniModules.Editor;
     using UnityEngine;
+    
+    #if UNITY_EDITOR
+    using UniModules.Editor;
+    #endif
+    
 
     [CreateAssetMenu(menuName = "MultiScene/Multi Scenes Collection", fileName = "Multi Scenes Collection")]
     public class MultiScenesAsset : ScriptableObject, IMultiSceneSettings
